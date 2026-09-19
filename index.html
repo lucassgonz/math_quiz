@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Platão ou Aristóteles?</title>
+  <meta name="description" content="Quiz filosófico sobre matemática e metafísica em Platão e Aristóteles. 10 questões em menos de 3 minutos.">
+  <meta property="og:title" content="Platão ou Aristóteles?">
+  <meta property="og:description" content="Quiz filosófico — 10 questões sobre matemática e metafísica na Grécia Antiga.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: #1c1620;
+      color: #f0e8d0;
+      font-family: 'Outfit', system-ui, sans-serif;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 50% at 50% -5%, rgba(201,148,58,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 60% 60% at 10% 110%, rgba(26,61,37,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 90% 90%, rgba(139,32,32,0.08) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    /* ── Screen system ── */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+      z-index: 1;
+      transition: opacity 0.45s ease, transform 0.45s ease;
+    }
+
+    .screen.out {
+      opacity: 0;
+      transform: scale(0.96);
+      pointer-events: none;
+    }
+
+    /* ── INTRO ── */
+    #intro { gap: 28px; text-align: center; }
+
+    .emblem { width: 100px; height: 100px; flex-shrink: 0; }
+
+    .intro-title {
+      font-family: 'Cormorant Garant', Georgia, serif;
+      font-size: clamp(2.4rem, 7vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.05;
+      letter-spacing: -0.01em;
+    }
+
+    .intro-title em { color: #c9943a; font-style: italic; }
+
+    .intro-sub {
+      font-size: clamp(0.9rem, 2.2vw, 1rem);
+      color: #9a8e7e;
+      line-height: 1.65;
+      max-width: 360px;
+    }
+
+    .intro-pills { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+    .pill {
+      background: #231a27;
+      border: 1px solid #3a2e45;
+      border-radius: 100px;
+      padding: 5px 15px;
+      font-size: 0.78rem;
+      color: #7a6e60;
+      letter-spacing: 0.04em;
+    }
+
+    .btn-primary {
+      background: #c9943a;
+      color: #1c1620;
+      border: none;
+      border-radius: 2px;
+      padding: 15px 52px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.18s, transform 0.1s;
+    }
+
+    .btn-primary:hover { background: #dda83e; }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-primary:focus-visible { outline: 2px solid #c9943a; outline-offset: 3px; }
+
+    /* ── GAME ── */
+    #game {
+      gap: 0;
+      justify-content: flex-start;
+      padding-top: 36px;
+      padding-bottom: 20px;
+      width: 100%;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .hud {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .q-counter {
+      font-size: 0.78rem;
+      color: #7a6e60;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .score-live {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #c9943a;
+      font-variant-numeric: tabular-nums;
+      transition: transform 0.15s;
+    }
+
+    .score-live.bump { transform: scale(1.25); }
+
+    .timer-track {
+      width: 100%;
+      height: 3px;
+      background: #2a2030;
+      border-radius: 2px;
+      margin-bottom: 22px;
+      overflow: hidden;
+    }
+
+    .timer-bar {
+      height: 100%;
+      background: #c9943a;
+      border-radius: 2px;
+      width: 100%;
+      transition-property: width, background;
+      transition-timing-function: linear, ease;
+    }
+
+    .timer-bar.urgent { background: #c04040; }
+
+    .q-card {
+      width: 100%;
+      background: #231a27;
+      border: 1px solid #352840;
+      border-left: 4px solid #c9943a;
+      border-radius: 4px;
+      padding: 30px 32px;
+      margin-bottom: 18px;
+      min-height: 148px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: background 0.3s, border-left-color 0.3s;
+    }
+
+    .q-card.correct {
+      background: rgba(20, 55, 28, 0.55);
+      border-left-color: #6ecf8a;
+    }
+
+    .q-card.wrong {
+      background: rgba(100, 20, 20, 0.35);
+      border-left-color: #c04040;
+    }
+
+    .q-eyebrow {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #5a4e40;
+    }
+
+    .q-text {
+      font-family: 'Cormorant Garant', Georgia, serif;
+      font-size: clamp(1.2rem, 3.2vw, 1.6rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.5;
+      color: #f0e8d0;
+    }
+
+    .fb-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      display: none;
+    }
+
+    .fb-label.show { display: block; }
+    .fb-label.ok { color: #6ecf8a; }
+    .fb-label.no { color: #e07070; }
+
+    .fb-explain {
+      font-size: 0.84rem;
+      color: #a89880;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .fb-explain.show { display: block; }
+
+    .choices {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .choice {
+      border: none;
+      border-radius: 4px;
+      padding: 18px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: transform 0.14s, filter 0.2s, opacity 0.25s;
+    }
+
+    .choice:focus-visible { outline: 2px solid #c9943a; outline-offset: 2px; }
+    .choice:hover:not(:disabled) { transform: translateY(-2px); filter: brightness(1.12); }
+    .choice:active:not(:disabled) { transform: scale(0.975); }
+    .choice:disabled { cursor: default; }
+    .choice.dimmed { opacity: 0.35; }
+
+    .choice-school {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .choice-name {
+      font-family: 'Cormorant Garant', Georgia, serif;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    #btn-plato { background: #1a3d25; color: #f0e8d0; }
+    #btn-plato .choice-school { color: #7de0a0; }
+
+    #btn-aris { background: #3a2010; color: #f0e8d0; }
+    #btn-aris .choice-school { color: #f0c060; }
+
+    /* ── RESULT ── */
+    #result { gap: 24px; text-align: center; max-width: 520px; margin: 0 auto; }
+
+    .res-title {
+      font-family: 'Cormorant Garant', Georgia, serif;
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
+      font-weight: 300;
+      color: #c9943a;
+    }
+
+    .res-grade {
+      font-family: 'Cormorant Garant', Georgia, serif;
+      font-size: clamp(1rem, 2.8vw, 1.25rem);
+      font-style: italic;
+      color: #8a7e6e;
+      line-height: 1.55;
+      max-width: 420px;
+    }
+
+    .score-box {
+      background: #231a27;
+      border: 1px solid #352840;
+      border-radius: 4px;
+      padding: 24px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+    }
+
+    .score-big {
+      font-size: clamp(3rem, 9vw, 4.5rem);
+      font-weight: 700;
+      color: #c9943a;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+    }
+
+    .score-cap {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #5a4e40;
+    }
+
+    .stats { display: flex; gap: 36px; justify-content: center; flex-wrap: wrap; }
+
+    .stat { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+
+    .stat-n {
+      font-size: 1.5rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .stat-l {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #6a5e50;
+    }
+
+    .btn-replay {
+      background: transparent;
+      border: 1px solid #c9943a;
+      color: #c9943a;
+      border-radius: 2px;
+      padding: 13px 40px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.18s, color 0.18s;
+    }
+
+    .btn-replay:hover { background: #c9943a; color: #1c1620; }
+    .btn-replay:focus-visible { outline: 2px solid #c9943a; outline-offset: 3px; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(14px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .anim { animation: slideUp 0.38s ease both; }
+
+    /* Mobile */
+    @media (max-width: 440px) {
+      .choices { grid-template-columns: 1fr; }
+      .q-text { font-size: 1.15rem; }
+      #game { padding-top: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .screen, .score-live, .anim { transition: none; animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── INTRO ── -->
+  <div class="screen" id="intro">
+    <svg class="emblem" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" stroke="#c9943a" stroke-width="1.2" opacity="0.55"/>
+      <circle cx="50" cy="50" r="39" stroke="#c9943a" stroke-width="0.5" opacity="0.25"/>
+      <polygon points="50,9 88,70 12,70" stroke="#c9943a" stroke-width="1.2" fill="none" opacity="0.65"/>
+      <circle cx="50" cy="50" r="18" stroke="#c9943a" stroke-width="0.5" fill="none" opacity="0.2"/>
+      <circle cx="50" cy="50" r="2.5" fill="#c9943a" opacity="0.45"/>
+    </svg>
+
+    <h1 class="intro-title">Platão <em>ou</em> Aristóteles?</h1>
+
+    <p class="intro-sub">
+      10 afirmações sobre matemática e metafísica.<br>
+      Você sabe quem as defendeu?
+    </p>
+
+    <div class="intro-pills">
+      <span class="pill">10 questões</span>
+      <span class="pill">15 s por pergunta</span>
+      <span class="pill">~3 minutos</span>
+    </div>
+
+    <button class="btn-primary" onclick="startGame()">Iniciar o Debate</button>
+  </div>
+
+  <!-- ── GAME ── -->
+  <div class="screen out" id="game">
+    <div class="hud">
+      <span class="q-counter" id="q-counter">Questão 1 de 10</span>
+      <span class="score-live" id="score-live" aria-live="polite">0 pts</span>
+    </div>
+
+    <div class="timer-track" role="progressbar" aria-label="Tempo restante">
+      <div class="timer-bar" id="timer-bar"></div>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <span class="q-eyebrow">Qual filósofo defendeu esta ideia?</span>
+      <p class="q-text" id="q-text"></p>
+      <span class="fb-label" id="fb-label"></span>
+      <p class="fb-explain" id="fb-explain"></p>
+    </div>
+
+    <div class="choices">
+      <button class="choice" id="btn-plato" onclick="answer('platao')">
+        <span class="choice-school">Academia</span>
+        <span class="choice-name">Platão</span>
+      </button>
+      <button class="choice" id="btn-aris" onclick="answer('aristoteles')">
+        <span class="choice-school">Liceu</span>
+        <span class="choice-name">Aristóteles</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── RESULT ── -->
+  <div class="screen out" id="result">
+    <svg class="emblem" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="50" cy="50" r="46" stroke="#c9943a" stroke-width="1.2" opacity="0.35"/>
+      <polygon points="50,9 88,70 12,70" stroke="#c9943a" stroke-width="1" fill="none" opacity="0.4"/>
+    </svg>
+
+    <p class="res-title">Resultado Final</p>
+    <p class="res-grade" id="res-grade"></p>
+
+    <div class="score-box">
+      <span class="score-big" id="final-pts">0</span>
+      <span class="score-cap" id="final-cap">pontos</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-n" id="st-correct" style="color:#6ecf8a">0</span>
+        <span class="stat-l">corretas</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" id="st-wrong" style="color:#e07070">0</span>
+        <span class="stat-l">erradas</span>
+      </div>
+      <div class="stat">
+        <span class="stat-n" id="st-bonus" style="color:#c9943a">+0</span>
+        <span class="stat-l">bônus tempo</span>
+      </div>
+    </div>
+
+    <button class="btn-replay" onclick="resetGame()">Jogar Novamente</button>
+  </div>
+
+  <script>
+    const QUESTIONS = [
+      {
+        text: "Os entes matemáticos existem em um mundo separado, como intermediários entre as Ideias puras e os objetos físicos.",
+        answer: "platao",
+        explain: "Platão postulou os entes matemáticos como intermediários: mais concretos que as Ideias, mais inteligíveis que os objetos físicos. (Metafísica A, 987b)"
+      },
+      {
+        text: "A matemática surge quando abstraímos propriedades das coisas sensíveis. Ela não existe separada da matéria.",
+        answer: "aristoteles",
+        explain: "Aristóteles afirmou que os objetos matemáticos existem por abstração: o geômetra pensa o círculo físico enquanto círculo. (Physica II, 2)"
+      },
+      {
+        text: "A Linha Dividida distingue quatro graus de conhecimento: Eikasía, Pístis, Diánoia e Nóesis.",
+        answer: "platao",
+        explain: "Na República VI, Platão propôs a Linha Dividida para representar a hierarquia do conhecimento — do mais opaco ao mais inteligível."
+      },
+      {
+        text: "A lógica deve ocupar o lugar da matemática como modelo do pensamento racional rigoroso.",
+        answer: "aristoteles",
+        explain: "Aristóteles precisou destituir a matemática do posto de ciência modelo. Para ele, a lógica — não a matemática — é o paradigma do raciocínio."
+      },
+      {
+        text: "Os sólidos geométricos regulares estruturam os elementos naturais: o fogo tem forma de tetraedro, a terra de cubo.",
+        answer: "platao",
+        explain: "No Timeu, Platão atribuiu formas geométricas precisas aos quatro elementos, integrando matemática e cosmologia."
+      },
+      {
+        text: "A substância concreta — composta de matéria e forma — é o ser primário, o fundamento de toda realidade.",
+        answer: "aristoteles",
+        explain: "A ontologia aristotélica coloca a substância sensível, não as Ideias abstratas, como o ser por excelência."
+      },
+      {
+        text: "Há um mundo inteligível de Ideias perfeitas, eternas e imutáveis — superior ao mundo sensível e passageiro.",
+        answer: "platao",
+        explain: "A teoria das Ideias é o coração do platonismo. O mundo sensível é apenas uma cópia imperfeita do mundo inteligível."
+      },
+      {
+        text: "O aritmético opera sobre os objetos físicos enquanto pensados como unidades indivisíveis — não sobre entidades separadas.",
+        answer: "aristoteles",
+        explain: "Aristóteles descreveu assim o funcionamento da matemática: trabalhando com aspectos abstraídos das coisas concretas. (Physica II, 2, 193b)"
+      },
+      {
+        text: "A alma imortal já contemplou as Ideias antes de encarnar. Aprender é recordar — anamnese.",
+        answer: "platao",
+        explain: "A teoria da anamnese platônica explica por que podemos compreender verdades matemáticas perfeitas sem jamais tê-las encontrado no mundo sensível."
+      },
+      {
+        text: "A física é a ciência primeira, pois estuda a substância sensível — e a matemática é subordinada a ela.",
+        answer: "aristoteles",
+        explain: "Aristóteles inverteu a hierarquia platônica: a física (sobre o concreto) precede a matemática, que é uma abstração do concreto."
+      }
+    ];
+
+    function shuffle(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    const TIME_PER_Q = 15;
+    let qs = [], idx = 0, score = 0, correct = 0, wrong = 0, bonus = 0;
+    let timerInt = null, timeLeft = TIME_PER_Q, canAns = true;
+
+    function showScreen(id) {
+      document.querySelectorAll('.screen').forEach(s =>
+        s.classList.toggle('out', s.id !== id)
+      );
+    }
+
+    function startGame() {
+      qs = shuffle(QUESTIONS);
+      idx = 0; score = 0; correct = 0; wrong = 0; bonus = 0;
+      showScreen('game');
+      showQ();
+    }
+
+    function showQ() {
+      const q = qs[idx];
+      canAns = true;
+
+      const card = document.getElementById('q-card');
+      card.className = 'q-card anim';
+      void card.offsetWidth;
+
+      document.getElementById('q-text').textContent = q.text;
+      document.getElementById('fb-label').className = 'fb-label';
+      document.getElementById('fb-label').textContent = '';
+      document.getElementById('fb-explain').className = 'fb-explain';
+      document.getElementById('fb-explain').textContent = '';
+      document.getElementById('q-counter').textContent = `Questão ${idx + 1} de ${qs.length}`;
+      document.getElementById('score-live').textContent = `${score} pts`;
+
+      const bp = document.getElementById('btn-plato');
+      const ba = document.getElementById('btn-aris');
+      bp.disabled = ba.disabled = false;
+      bp.className = 'choice';
+      ba.className = 'choice';
+
+      timeLeft = TIME_PER_Q;
+      const bar = document.getElementById('timer-bar');
+      bar.style.transition = 'none';
+      bar.style.width = '100%';
+      bar.classList.remove('urgent');
+
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        bar.style.transition = `width ${TIME_PER_Q}s linear, background 0.3s ease`;
+        bar.style.width = '0%';
+      }));
+
+      clearInterval(timerInt);
+      timerInt = setInterval(() => {
+        timeLeft--;
+        if (timeLeft <= 4) bar.classList.add('urgent');
+        if (timeLeft <= 0) { clearInterval(timerInt); onTimeout(); }
+      }, 1000);
+    }
+
+    function reveal(isCorrect, chosenKey) {
+      clearInterval(timerInt);
+      canAns = false;
+
+      const q = qs[idx];
+      const card = document.getElementById('q-card');
+      const lbl = document.getElementById('fb-label');
+      const exp = document.getElementById('fb-explain');
+      const bp = document.getElementById('btn-plato');
+      const ba = document.getElementById('btn-aris');
+
+      bp.disabled = ba.disabled = true;
+
+      const correctBtn = q.answer === 'platao' ? bp : ba;
+      const wrongBtn   = q.answer === 'platao' ? ba : bp;
+
+      if (isCorrect) {
+        correct++;
+        const t = Math.max(0, timeLeft);
+        const speedBonus = Math.round(t / 3); // max +5 pts
+        score += 20 + speedBonus;
+        bonus += speedBonus;
+        card.classList.add('correct');
+        lbl.className = 'fb-label show ok';
+        lbl.textContent = speedBonus > 0
+          ? `Correto! +20 pts${speedBonus > 0 ? ` (+${speedBonus} velocidade)` : ''}`
+          : `Correto! +20 pontos`;
+      } else {
+        wrong++;
+        card.classList.add('wrong');
+        lbl.className = 'fb-label show no';
+        const name = q.answer === 'platao' ? 'Platão' : 'Aristóteles';
+        lbl.textContent = chosenKey
+          ? `Incorreto — a resposta era ${name}`
+          : `Tempo esgotado — era ${name}`;
+        wrongBtn.classList.add('dimmed');
+      }
+
+      correctBtn.classList.remove('dimmed');
+      exp.className = 'fb-explain show';
+      exp.textContent = q.explain;
+
+      const sl = document.getElementById('score-live');
+      sl.textContent = `${score} pts`;
+      sl.classList.add('bump');
+      setTimeout(() => sl.classList.remove('bump'), 200);
+
+      setTimeout(advance, 2800);
+    }
+
+    function answer(choice) {
+      if (!canAns) return;
+      reveal(choice === qs[idx].answer, choice);
+    }
+
+    function onTimeout() {
+      if (!canAns) return;
+      reveal(false, null);
+    }
+
+    function advance() {
+      idx++;
+      if (idx >= qs.length) showResult();
+      else showQ();
+    }
+
+    const GRADES = [
+      { min: 0.9, text: '"Contemplastes as Ideias com olhos de filósofo." — Aprovado na Academia e no Liceu.' },
+      { min: 0.7, text: '"Quem muito sabe, muito ainda pode aprender." — Excelente desempenho.' },
+      { min: 0.5, text: '"A sabedoria começa no reconhecimento da ignorância." — Sócrates aprova o esforço.' },
+      { min: 0.3, text: '"O começo de toda filosofia é a admiração." — Releia os slides e volte ao debate.' },
+      { min: 0,   text: '"A caverna ainda te espera." — Mais uma leitura e você verá a luz.' }
+    ];
+
+    function showResult() {
+      showScreen('result');
+      document.getElementById('final-pts').textContent = score;
+      document.getElementById('final-cap').textContent = `pontos de ${qs.length * (20 + 5)}`;
+      document.getElementById('st-correct').textContent = correct;
+      document.getElementById('st-wrong').textContent = wrong;
+      document.getElementById('st-bonus').textContent = `+${bonus}`;
+      const pct = correct / qs.length;
+      const grade = GRADES.find(g => pct >= g.min) || GRADES[GRADES.length - 1];
+      document.getElementById('res-grade').textContent = grade.text;
+    }
+
+    function resetGame() { showScreen('intro'); }
+  </script>
+</body>
+</html>
